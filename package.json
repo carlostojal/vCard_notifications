@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/carlostojal/vCard_notifications/issues"
   },
-  "homepage": "https://github.com/carlostojal/vCard_notifications#readme"
+  "homepage": "https://github.com/carlostojal/vCard_notifications#readme",
+  "dependencies": {
+    "ws": "^8.14.2"
+  }
 }
