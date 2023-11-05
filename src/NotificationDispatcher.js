@@ -12,6 +12,7 @@ export default class NotificationDispatcher {
 
     unregisterClient(user_id) {
         // unregister a client from its websocket instance
+        console.log(`Client ${user_id} disconnected`);
         delete this._clients[user_id];
     }
 
@@ -23,5 +24,18 @@ export default class NotificationDispatcher {
     sendNotification(user_id, notification) {
         // send a notification to a client
         this._clients[user_id].send(JSON.stringify(notification));
+    }
+
+    static onNotificationDispatch(dispatcher, sender, notification) {
+        // dispatch the notification to the destination
+        notification = JSON.parse(notification);
+
+        // check if the destination is online
+        if(!dispatcher.isClientOnline(notification._destination)) {
+            return;
+        }
+
+        // send the notification
+        dispatcher.sendNotification(notification._destination, notification);
     }
 }
