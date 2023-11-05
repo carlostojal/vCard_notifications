@@ -17,6 +17,15 @@ const dispatcher = new NotificationDispatcher();
 // listen for new client connections
 wss.on('connection', (ws, request, client) => {
 
+    // register the websocket event handlers
+    ws.on('message', (notification) => {
+        NotificationDispatcher.onNotificationDispatch(dispatcher, client, notification);
+    });
+
+    ws.on('close', () => {
+        dispatcher.unregisterClient(client);
+    });
+
     // register the client with the dispatcher
     dispatcher.registerClient(client, ws);
 
