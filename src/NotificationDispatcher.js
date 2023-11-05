@@ -1,13 +1,13 @@
 
-class NotificationDispatcher {
+export default class NotificationDispatcher {
 
     constructor() {
         this._clients = {};
     }
 
-    registerClient(user_id, websocket) {
+    registerClient(user_id, ws) {
         // register a new client to its websocket instance
-        this._clients[user_id] = websocket;
+        this._clients[user_id] = ws;
     }
 
     unregisterClient(user_id) {
