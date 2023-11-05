@@ -14,14 +14,17 @@ export class Notification {
         this._message = message;
     }
 
+    // this is the destination user ID
     getDestination() {
         return this._destination;
     }
 
+    // this is the type of notification
     getType() {
         return this._type;
     }
 
+    // this is the message to display to the user
     getMessage() {
         return this._message;
     }
