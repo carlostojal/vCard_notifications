@@ -9,18 +9,20 @@ export const NotificationType = {
 export class Notification {
 
     constructor(destination, type, message) {
-        // TODO
+        this._destination = destination;
+        this._type = type;
+        this._message = message;
     }
 
     getDestination() {
-        // TODO
+        return this._destination;
     }
 
     getType() {
-        // TODO
+        return this._type;
     }
 
     getMessage() {
-        // TODO
+        return this._message;
     }
 }
