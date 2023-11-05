@@ -1,6 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { createServer, request } from 'http';
-import { Notification, NotificationType } from './Notification.js';
+import { createServer } from 'http';
 import NotificationDispatcher from './NotificationDispatcher.js';
 import Authentication from './Authentication.js';
 import 'dotenv/config.js'
