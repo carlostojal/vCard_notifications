@@ -32,6 +32,7 @@ export default class NotificationDispatcher {
 
         // check if the destination is online
         if(!dispatcher.isClientOnline(notification._destination)) {
+            console.warn("Destination is offline");
             return;
         }
 

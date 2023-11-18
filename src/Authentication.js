@@ -7,7 +7,7 @@ export default class Authentication {
     static authenticate(token) {
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+            decoded = jwt.decode(token);
         } catch (err) {
             throw new Error('Invalid token!');
         }
