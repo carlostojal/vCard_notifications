@@ -36,6 +36,29 @@ io.on('connection', (socket, request, client) => {
     console.log(`New client ${client} connected`);
 });
 
+// register the authorization middleware
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if(!token) {
+        return next(new Error("Missing token"));
+    }
+
+    // verify the token
+    Authentication.authenticate(token)
+        .then((payload) => {
+            // set the client id
+            socket.client = payload.sub;
+
+            // continue
+            next();
+        })
+        .catch((error) => {
+            // invalid token
+            next(new Error("Invalid token"));
+        });
+});
+
 server.listen(process.env.WEBSOCKET_SERVER_PORT, () => {
     console.log(`🚀 Server listening on port ${process.env.WEBSOCKET_SERVER_PORT}`);
 });
