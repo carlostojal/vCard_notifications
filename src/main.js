@@ -9,7 +9,30 @@ import 'dotenv/config.js'
 const server = createServer();
 
 // create the websocket server
-const io = new Server(server);
+const io = new Server(server, {
+    transports: ['websocket', 'polling'],
+    cors: {
+        origin: process.env.FRONTEND_URL,
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+let clientId = null;
+
+io.use((socket, next) => {
+
+    let handshakeData = socket.request;
+
+    if(!handshakeData._query['client_id']) {
+        next(new Error("Invalid client id"));
+        return;
+    }
+
+    clientId = handshakeData._query['client_id'];
+
+    next();
+});
 
 // create the notification dispatcher instance
 const dispatcher = new NotificationDispatcher();
@@ -46,13 +69,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        dispatcher.unregisterClient(client);
+        dispatcher.unregisterClient(clientId);
     });
 
     // register the client with the dispatcher
-    dispatcher.registerClient(client, socket);
+    dispatcher.registerClient(clientId, socket);
 
-    console.log(`New client ${client} connected`);
+    console.log(`New client ${clientId} connected`);
 });
 
 server.listen(process.env.WEBSOCKET_SERVER_PORT, () => {
