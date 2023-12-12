@@ -32,7 +32,18 @@ io.on('connection', (socket) => {
         }
     });
 
-    // TODO: on transaction
+    // on transaction
+    socket.on("transaction", (transaction) => {
+
+        transaction = JSON.parse(transaction);
+
+        try {
+            // send the transaction to the destination
+            dispatcher.sendTransaction(transaction.destination, transaction);
+        } catch (err) {
+            console.error(err);
+        }
+    });
 
     socket.on('disconnect', () => {
         dispatcher.unregisterClient(client);
