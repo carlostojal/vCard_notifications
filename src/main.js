@@ -15,16 +15,24 @@ const io = new Server(server);
 const dispatcher = new NotificationDispatcher();
 
 // listen for new client connections
-io.on('connection', (socket, request, client) => {
+io.on('connection', (socket) => {
 
     // register the websocket event handlers
-    socket.on('message', (notification) => {
-        NotificationDispatcher.onNotificationDispatch(dispatcher, client, notification);
+    
+    // on notification
+    socket.on("notification", (notification) => {
+
+        notification = JSON.parse(notification);
+
+        try {
+            // send the notification to the destination
+            dispatcher.sendNotification(notification.destination, notification);
+        } catch (err) {
+            console.error(err);
+        }
     });
 
-    socket.on('close', () => {
-        dispatcher.unregisterClient(client);
-    });
+    // TODO: on transaction
 
     socket.on('disconnect', () => {
         dispatcher.unregisterClient(client);
@@ -34,29 +42,6 @@ io.on('connection', (socket, request, client) => {
     dispatcher.registerClient(client, socket);
 
     console.log(`New client ${client} connected`);
-});
-
-// register the authorization middleware
-io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-
-    if(!token) {
-        return next(new Error("Missing token"));
-    }
-
-    // verify the token
-    Authentication.authenticate(token)
-        .then((payload) => {
-            // set the client id
-            socket.client = payload.sub;
-
-            // continue
-            next();
-        })
-        .catch((error) => {
-            // invalid token
-            next(new Error("Invalid token"));
-        });
 });
 
 server.listen(process.env.WEBSOCKET_SERVER_PORT, () => {
