@@ -23,7 +23,20 @@ export default class NotificationDispatcher {
 
     sendNotification(user_id, notification) {
         // send a notification to a client
-        this._clients[user_id].send(JSON.stringify(notification));
+        if(!this.isClientOnline(user_id)) {
+            throw new Error("Client is offline");
+        }
+        this._clients[user_id].emit("notification", JSON.stringify(notification));
+    }
+
+    sendTransaction(user_id, transaction) {
+
+        // send the transaction to the client
+        if(!this.isClientOnline(user_id)) {
+            throw new Error("Client is offline");
+        }
+
+        this._clients[user_id].emit("transaction", JSON.stringify(transaction));
     }
 
     static onNotificationDispatch(dispatcher, sender, notification) {
