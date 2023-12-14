@@ -1,8 +1,6 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { createServer } from 'http';
 import NotificationDispatcher from './NotificationDispatcher.js';
-import Authentication from './Authentication.js';
-import Utils from './Utils.js';
 import 'dotenv/config.js'
 
 // create the http server
@@ -18,11 +16,11 @@ const io = new Server(server, {
     }
 });
 
-let clientId = null;
+let clientId: string | undefined = undefined;
 
 io.use((socket, next) => {
 
-    let handshakeData = socket.request;
+    let handshakeData: any = socket.request;
 
     if(!handshakeData._query['client_id']) {
         next(new Error("Invalid client id"));
@@ -38,44 +36,46 @@ io.use((socket, next) => {
 const dispatcher = new NotificationDispatcher();
 
 // listen for new client connections
-io.on('connection', (socket) => {
+io.on('connection', (socket: Socket) => {
 
     // register the websocket event handlers
     
     // on notification
-    socket.on("notification", (notification) => {
+    socket.on("notification", (notification: string) => {
 
-        notification = JSON.parse(notification);
+        let notification_obj = JSON.parse(notification);
 
         try {
             // send the notification to the destination
-            dispatcher.sendNotification(notification.destination, notification);
+            dispatcher.sendNotification(notification_obj.destination, notification_obj);
         } catch (err) {
             console.error(err);
         }
     });
 
     // on transaction
-    socket.on("transaction", (transaction) => {
+    socket.on("transaction", (transaction: string) => {
 
-        transaction = JSON.parse(transaction);
+        let transaction_obj = JSON.parse(transaction);
 
         try {
             // send the transaction to the destination
-            dispatcher.sendTransaction(transaction.destination, transaction);
+            dispatcher.sendTransaction(transaction_obj.destination, transaction);
         } catch (err) {
             console.error(err);
         }
     });
 
     socket.on('disconnect', () => {
-        dispatcher.unregisterClient(clientId);
+        dispatcher.unregisterSocket(socket);
     });
 
     // register the client with the dispatcher
-    dispatcher.registerClient(clientId, socket);
+    if(clientId) {
+        dispatcher.registerClient(clientId, socket);
 
-    console.log(`New client ${clientId} connected`);
+        console.log(`New client ${clientId} connected`);
+    }
 });
 
 server.listen(process.env.WEBSOCKET_SERVER_PORT, () => {

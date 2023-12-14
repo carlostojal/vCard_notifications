@@ -1,8 +1,9 @@
+
 export default class Utils {
 
-    static getRequestParams(url) {
+    static getRequestParams(url: string): Map<string, string> {
 
-        let params = {};
+        let params = new Map<string, string>();
 
         let tmp = url.split('?');
 
@@ -10,7 +11,7 @@ export default class Utils {
 
         tmp.forEach((param) => {
             let [key, value] = param.split('=');
-            params[key] = value;
+            params.set(key, value);
         })
 
         return params;
