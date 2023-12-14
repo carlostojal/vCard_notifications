@@ -1,12 +1,16 @@
 import { Server, Socket } from 'socket.io';
-import { createServer } from 'http';
+import http, { createServer } from 'http';
 import NotificationDispatcher from './NotificationDispatcher.js';
 import { HistoryManager } from './HistoryManager.js';
 import type { Notification } from './Notification.js';
+import express, { Express, Request, Response } from 'express';
 import 'dotenv/config.js'
 
+// create express app
+const app: Express = express();
+
 // create the http server
-const server = createServer();
+const server: http.Server = createServer(app);
 
 // create the websocket server
 const io = new Server(server, {
@@ -18,19 +22,11 @@ const io = new Server(server, {
     }
 });
 
-// client id
-let clientId: string | undefined = undefined;
-
 io.use((socket, next) => {
 
-    let handshakeData: any = socket.request;
-
-    if(!handshakeData._query['client_id']) {
-        next(new Error("Invalid client id"));
-        return;
+    if(socket.handshake.auth.userId == undefined) {
+        return next(new Error("Client ID not provided!"));
     }
-
-    clientId = handshakeData._query['client_id'];
 
     next();
 });
@@ -39,11 +35,11 @@ io.use((socket, next) => {
 const dispatcher = new NotificationDispatcher();
 
 // history manager
-const historyManager = new HistoryManager(process.env.HISTORY_FILE || "data/history.json");
+const historyManager = new HistoryManager(process.env.HISTORY_FILE || "./data/history.json");
 try {
     historyManager.loadFromFile();
 } catch (err) {
-    console.error(err);
+    console.error("Could not open history file");
 }
 
 // listen for new client connections
@@ -83,13 +79,17 @@ io.on('connection', (socket: Socket) => {
     });
 
     // register the client with the dispatcher
-    if(clientId) {
-        dispatcher.registerClient(clientId, socket);
+    dispatcher.registerClient(socket.handshake.auth.userId, socket);
 
-        console.log(`New client ${clientId} connected`);
-    }
+    console.log(`New client ${socket.handshake.auth.userId} connected`);
 });
 
+// define the history endpoint
+app.get('/history/:user_id', (req: Request, res: Response) => {
+    res.json(historyManager.getHistory(req.params.user_id));
+});
+
+// start the server
 server.listen(process.env.WEBSOCKET_SERVER_PORT, () => {
     console.log(`🚀 Server listening on port ${process.env.WEBSOCKET_SERVER_PORT}`);
 });

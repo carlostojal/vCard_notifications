@@ -21,15 +21,20 @@ export class HistoryManager {
         let userHistory = this.history.get(user) || [];
         userHistory.push(notification);
         this.history.set(user, userHistory);
+        this.saveToFile();
     }
 
     public loadFromFile() {
         let rawdata = fs.readFileSync(this.filename);
-        this.history = new Map<string, Array<any>>(JSON.parse(rawdata.toString()));
+        this.history = new Map<string, Array<Notification>>(JSON.parse(rawdata.toString()));
     }
 
     public saveToFile() {
-        fs.unlinkSync(this.filename);
-        fs.writeFileSync(this.filename, JSON.stringify(Array.from(this.history.entries())));
+        try {
+            fs.unlinkSync(this.filename);
+        } catch (err) {
+            // ignore
+        }
+        fs.writeFileSync(this.filename, JSON.stringify(Array.from(this.history.entries())), { flag: 'wx' });
     }
 }
