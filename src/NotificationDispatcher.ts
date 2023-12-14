@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import type { Notification } from "./Notification";
 
 export default class NotificationDispatcher {
 

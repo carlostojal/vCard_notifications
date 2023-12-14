@@ -1,6 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { createServer } from 'http';
 import NotificationDispatcher from './NotificationDispatcher.js';
+import { HistoryManager } from './HistoryManager.js';
+import type { Notification } from './Notification.js';
 import 'dotenv/config.js'
 
 // create the http server
@@ -16,6 +18,7 @@ const io = new Server(server, {
     }
 });
 
+// client id
 let clientId: string | undefined = undefined;
 
 io.use((socket, next) => {
@@ -35,6 +38,14 @@ io.use((socket, next) => {
 // create the notification dispatcher instance
 const dispatcher = new NotificationDispatcher();
 
+// history manager
+const historyManager = new HistoryManager(process.env.HISTORY_FILE || "data/history.json");
+try {
+    historyManager.loadFromFile();
+} catch (err) {
+    console.error(err);
+}
+
 // listen for new client connections
 io.on('connection', (socket: Socket) => {
 
@@ -43,11 +54,12 @@ io.on('connection', (socket: Socket) => {
     // on notification
     socket.on("notification", (notification: string) => {
 
-        let notification_obj = JSON.parse(notification);
+        let notification_obj: Notification = JSON.parse(notification);
 
         try {
             // send the notification to the destination
             dispatcher.sendNotification(notification_obj.destination, notification_obj);
+            historyManager.addNotification(notification_obj.destination, notification_obj);
         } catch (err) {
             console.error(err);
         }

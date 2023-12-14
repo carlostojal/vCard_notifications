@@ -11,6 +11,7 @@ export class Notification {
     destination: string;
     type: NotificationType;
     message: string;
+    read: boolean = false;
 
     constructor(destination: string, type: NotificationType, message: string) {
         this.destination = destination;
@@ -31,5 +32,14 @@ export class Notification {
     // this is the message to display to the user
     getMessage() {
         return this.message;
+    }
+
+    // this is whether the notification has been read
+    isRead() {
+        return this.read;
+    }
+
+    setRead(read: boolean) {
+        this.read = read;
     }
 }
