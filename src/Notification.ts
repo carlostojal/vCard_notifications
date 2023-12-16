@@ -12,11 +12,13 @@ export class Notification {
     type: NotificationType;
     message: string;
     read: boolean = false;
+    timestamp: number = Date.now();
 
     constructor(destination: string, type: NotificationType, message: string) {
         this.destination = destination;
         this.type = type;
         this.message = message;
+        this.timestamp = Date.now();
     }
 
     // this is the destination user ID
@@ -41,5 +43,9 @@ export class Notification {
 
     setRead(read: boolean) {
         this.read = read;
+    }
+
+    getTimestamp() {
+        return this.timestamp;
     }
 }

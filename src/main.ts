@@ -52,6 +52,9 @@ io.on('connection', (socket: Socket) => {
 
         let notification_obj: Notification = JSON.parse(notification);
 
+        // assign the current timestamp
+        notification_obj.timestamp = Date.now();
+
         try {
             // send the notification to the destination
             dispatcher.sendNotification(notification_obj.destination, notification_obj);

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import type { Notification } from './Notification';
+import { Utils, SortDirection } from './Utils';
 
 export class HistoryManager {
 
@@ -14,6 +15,13 @@ export class HistoryManager {
     // get history for user
     public getHistory(user: string): Array<any> {
         return this.history.get(user) || [];
+    }
+
+    public getOrderedHistory(user: string): Array<any> {
+        let history = this.getHistory(user);
+        // sort the history
+        history = Utils.sortHistory(history, SortDirection.DESC);
+        return history;
     }
 
     // add history for user

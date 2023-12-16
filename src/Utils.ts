@@ -1,5 +1,11 @@
+import { Notification } from "./Notification";
 
-export default class Utils {
+export enum SortDirection {
+    ASC = 1,
+    DESC = -1
+};
+
+export class Utils {
 
     static getRequestParams(url: string): Map<string, string> {
 
@@ -15,5 +21,17 @@ export default class Utils {
         })
 
         return params;
+    }
+
+    static sortHistory(history: Array<Notification>, direction: SortDirection): Array<Notification> {
+
+        let sortedHistory = history.sort((a, b) => {
+            if(direction == SortDirection.ASC)
+                return a.timestamp - b.timestamp;
+            else
+                return b.timestamp - a.timestamp;
+        });
+
+        return sortedHistory;
     }
 }
