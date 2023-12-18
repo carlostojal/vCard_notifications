@@ -18,6 +18,9 @@ First, you need to setup the app by creating a `.env` file. Create a copy of the
 ### Bare metal
 
 - Run `npm install`;
+- Run `npm run build`;
+- Get the Firebase service account key from the Firebase console and place it in `keys/serviceAccountKey.json`, or update the `.env` accordingly.
+- Verify that the variable `FIREBASE_PROJECT_ID` is right.
 - Run `npm start`.
 
 ### Docker
