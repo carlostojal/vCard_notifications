@@ -1,6 +1,6 @@
 import fs from 'fs';
-import type { Notification } from './Notification';
-import { Utils, SortDirection } from './Utils';
+import type { Notification } from './Notification.js';
+import { Utils, SortDirection } from './Utils.js';
 
 export class HistoryManager {
 
