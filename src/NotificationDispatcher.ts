@@ -1,10 +1,8 @@
 import { Socket } from "socket.io";
-import type { Notification } from "./Notification";
-import Client from './Client';
+import type { Notification } from "./Notification.js";
+import Client from './Client.js';
 import { App, initializeApp, cert } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
-
-const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH || "./keys/serviceAccountKey.json");
 
 export default class NotificationDispatcher {
 
@@ -17,7 +15,7 @@ export default class NotificationDispatcher {
 
         // create firebase app
         this.firebaseApp = initializeApp({
-            credential: cert(serviceAccount),
+            credential: cert(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH || "./keys/serviceAccountKey.json"),
             projectId: process.env.FIREBASE_PROJECT_ID
         });
     }
