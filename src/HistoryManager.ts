@@ -13,11 +13,11 @@ export class HistoryManager {
     }
 
     // get history for user
-    public getHistory(user: string): Array<any> {
+    public getHistory(user: string): Array<Notification> {
         return this.history.get(user) || [];
     }
 
-    public getOrderedHistory(user: string): Array<any> {
+    public getOrderedHistory(user: string): Array<Notification> {
         let history = this.getHistory(user);
         // sort the history
         history = Utils.sortHistory(history, SortDirection.DESC);
@@ -30,6 +30,13 @@ export class HistoryManager {
         userHistory.push(notification);
         this.history.set(user, userHistory);
         this.saveToFile();
+    }
+
+    public toggleRead(userId: string, notificationId: string) {
+        this.history.get(userId)?.map((notification: Notification) => {
+            if(notification.id == notificationId)
+                notification.read = !notification.read;
+        });
     }
 
     public loadFromFile() {

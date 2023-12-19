@@ -93,6 +93,15 @@ app.get('/history/:user_id', (req: Request, res: Response) => {
     res.json(historyManager.getHistory(req.params.user_id));
 });
 
+app.patch('/history/:user_id/:notif_id', (req: Request, res: Response) => {
+    if(req.params.user_id == undefined || req.params.notif_id == undefined) {
+        res.status(400);
+        res.send("User ID or notification ID not set");
+    }
+
+    historyManager.toggleRead(req.params.user_id, req.params.notif_id);
+});
+
 // register a firebase client id to a vcard phone number
 app.post('/registerFirebaseClient', (req: Request, res: Response) => {
     // get the phone number from the request
@@ -108,6 +117,8 @@ app.post('/registerFirebaseClient', (req: Request, res: Response) => {
         res.send("Phone number and Firebase ID must be provided!");
         return;
     }
+
+    console.log("Registered Firebase client")
 
     // register the firebase id
     dispatcher.registerFirebase(phone_number, firebase_id);
