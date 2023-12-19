@@ -8,6 +8,7 @@ import 'dotenv/config.js'
 
 // create express app
 const app: Express = express();
+app.use(express.json());
 
 // create the http server
 const server: http.Server = createServer(app);
@@ -82,7 +83,7 @@ io.on('connection', (socket: Socket) => {
     });
 
     // register the client with the dispatcher
-    dispatcher.registerClient(socket.handshake.auth.userId, socket);
+    dispatcher.registerWebSocket(socket.handshake.auth.userId, socket);
 
     console.log(`New client ${socket.handshake.auth.userId} connected`);
 });
@@ -90,6 +91,26 @@ io.on('connection', (socket: Socket) => {
 // define the history endpoint
 app.get('/history/:user_id', (req: Request, res: Response) => {
     res.json(historyManager.getHistory(req.params.user_id));
+});
+
+// register a firebase client id to a vcard phone number
+app.post('/registerFirebaseClient', (req: Request, res: Response) => {
+    // get the phone number from the request
+    const phone_number = req.body.phone_number;
+
+    // get the firebase id from the request
+    const firebase_id = req.body.firebase_id;
+
+    // check if both were provided
+    if(phone_number == undefined || firebase_id == undefined) {
+        // bad request
+        res.status(400);
+        res.send("Phone number and Firebase ID must be provided!");
+        return;
+    }
+
+    // register the firebase id
+    dispatcher.registerFirebase(phone_number, firebase_id);
 });
 
 // start the server
