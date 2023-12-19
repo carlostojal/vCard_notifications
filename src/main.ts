@@ -6,10 +6,14 @@ import type { Notification } from './Notification.js';
 import express, { Express, Request, Response } from 'express';
 import { v4 as uuidv4} from 'uuid';
 import 'dotenv/config.js'
+import cors from 'cors';
 
 // create express app
 const app: Express = express();
 app.use(express.json());
+app.use(cors({
+    origin: "*"
+}))
 
 // create the http server
 const server: http.Server = createServer(app);
