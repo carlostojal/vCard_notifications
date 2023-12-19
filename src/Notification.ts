@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export enum NotificationType {
     INFO = "info",
     CREDIT_IN = "credit_in",
@@ -8,6 +10,7 @@ export enum NotificationType {
 
 export class Notification {
 
+    id: string;
     destination: string;
     type: NotificationType;
     message: string;
@@ -15,6 +18,7 @@ export class Notification {
     timestamp: number = Date.now();
 
     constructor(destination: string, type: NotificationType, message: string) {
+        this.id = uuidv4();
         this.destination = destination;
         this.type = type;
         this.message = message;
