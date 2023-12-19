@@ -4,6 +4,7 @@ import NotificationDispatcher from './NotificationDispatcher.js';
 import { HistoryManager } from './HistoryManager.js';
 import type { Notification } from './Notification.js';
 import express, { Express, Request, Response } from 'express';
+import { v4 as uuidv4} from 'uuid';
 import 'dotenv/config.js'
 
 // create express app
@@ -88,6 +89,19 @@ io.on('connection', (socket: Socket) => {
     console.log(`New client ${socket.handshake.auth.userId} connected`);
 });
 
+app.put('/notifications', (req: Request, res: Response) => {
+
+    let notif: Notification = req.body;
+
+    notif.id = uuidv4();
+
+    dispatcher.sendNotification(notif.destination, notif);
+    historyManager.addNotification(notif.destination, notif);
+
+    res.status(200);
+    res.send();
+});
+
 // define the history endpoint
 app.get('/history/:user_id', (req: Request, res: Response) => {
     res.json(historyManager.getHistory(req.params.user_id));
@@ -100,6 +114,8 @@ app.patch('/history/:user_id/:notif_id', (req: Request, res: Response) => {
     }
 
     historyManager.toggleRead(req.params.user_id, req.params.notif_id);
+    res.status(200);
+    res.send();
 });
 
 // register a firebase client id to a vcard phone number
@@ -122,6 +138,9 @@ app.post('/registerFirebaseClient', (req: Request, res: Response) => {
 
     // register the firebase id
     dispatcher.registerFirebase(phone_number, firebase_id);
+
+    res.status(200);
+    res.send();
 });
 
 // start the server
